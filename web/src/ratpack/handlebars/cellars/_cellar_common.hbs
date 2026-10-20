@@ -1,0 +1,76 @@
+<div class="row hidden-print">
+	<div class="col-sm-9 content-float-hor push-bit-top-bottom">
+      {{#if photo}}
+		  <img class="img-thumbnail img-thumbnail-avatar-2x pull-left"
+		       src="{{photo.largeUrl}}" alt="{{cellar.displayName}}"/>
+      {{/if}}
+		<ul class="cellar-bio">
+          {{#if cellar.location}}
+			  <li>{{cellar.location}}</li>
+          {{/if}}
+          {{#if cellar.website}}
+			  <li><a href="{{cellar.website}}"
+			         title="{{cellar.displayName}}'s website">{{cellar.website}}</a></li>
+          {{/if}}
+		</ul>
+      {{#if cellar.bio}}
+		  <p>{{cellar.bio}}</p>
+      {{/if}}
+		<a href="https://{{hostname}}/cellars/{{cellar.screenName}}"
+		   class="btn btn-effect-ripple btn-sm btn-danger">
+			<i class="fa fa-link"> Permalink</i>
+		</a>
+		<a href="https://twitter.com/share"
+		   data-url="https://{{hostname}}/cellars/{{cellar.screenName}}"
+
+          {{#if self}}
+		   data-text="Check out my beer cellar on @cellarhq!"
+          {{else}}
+		   data-text="Check out @{{cellar.screenName}}'s beer cellar on @cellarhq!"
+          {{/if}}
+		   data-related="cellarhq" data-size="large" data-lang="en" data-count="none"
+		   class="btn btn-effect-ripple btn-primary btn-sm"
+		   style="overflow: hidden; position: relative;">
+			<i class="fa fa-twitter"></i> Tweet</a>
+		</a>
+    {{#if self}}
+		<a id="export-link"
+		   class="btn btn-effect-ripple btn-sm"
+		   download="cellarhq.csv"
+		   href="/cellars/{{cellar.slug}}/export">
+			Export Cellar
+		</a>
+    {{/if}}
+		<script>!function (d, s, id) {
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (!d.getElementById(id)) {
+				js = d.createElement(s);
+				js.id = id;
+				js.src = "//platform.twitter.com/widgets.js";
+				fjs.parentNode.insertBefore(js, fjs);
+			}
+		}(document, "script", "twitter-wjs");</script>
+	</div>
+	<div class="list-group pull-right col-sm-3 col-md-3 cold-lg-3 ">
+	  <a href="javascript:void(0)" class="list-group-item">
+		  <span class="badge">{{cellar.totalBeers}}</span>
+		  <h4 class="list-group-item-heading"><strong>Total Beers</strong></h4>
+	  </a>
+	  <a href="javascript:void(0)" class="list-group-item">
+		  <span class="badge">{{cellar.uniqueBeers}}</span>
+		  <h4 class="list-group-item-heading"><strong>Unique Beers</strong></h4>
+	  </a>
+	  <a href="javascript:void(0)" class="list-group-item">
+		  <span class="badge">{{cellar.uniqueBreweries}}</span>
+		  <h4 class="list-group-item-heading"><strong>Breweries</strong></h4>
+	  </a>
+    {{#if usesBinIdentifiers}}
+      {{#each binStats.entries}}
+	      <a href="javascript:void(0)" class="list-group-item">
+		      <span class="badge">{{value}}</span>
+		      <h4 class="list-group-item-heading"><strong>Bin {{key}}</strong></h4>
+	      </a>
+      {{/each}}
+    {{/if}}
+  </div>
+</div>

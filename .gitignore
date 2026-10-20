@@ -1,0 +1,29 @@
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+build/
+out/
+.gradle
+*.iml
+*.ipr
+*.iws
+.idea/
+.vagrant
+.DS_Store
+*.ids
+.env
+snapshots/*
+
+app.log
+app*.gz
+
+assets/AppUI 1.0 by pixelcave/
+phantomjsdriver.log
+
+twitter4j.properties
+*.sql

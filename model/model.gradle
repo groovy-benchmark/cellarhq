@@ -1,0 +1,119 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+}
+
+plugins {
+  id 'java-library'
+  id 'groovy'
+  id 'idea'
+  id "org.liquibase.gradle" version "2.0.2"
+  id "nu.studer.jooq" version "4.1"
+  id "org.kordamp.gradle.codenarc" version "0.31.2"
+}
+
+repositories {
+  jcenter()
+}
+
+dependencies {
+  jooqRuntime databaseDriver
+
+  liquibaseRuntime "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
+  liquibaseRuntime "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+  liquibaseRuntime 'org.liquibase:liquibase-core:3.8.1'
+  liquibaseRuntime databaseDriver
+
+  implementation 'org.codehaus.groovy:groovy-all:2.5.9'
+  api databaseDriver
+  api 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+  api "org.jooq:jooq:${jooqVersion}"
+  api "org.jooq:jooq-meta:${jooqVersion}"
+  api 'javax.annotation:javax.annotation-api:1.3.2'
+  implementation "org.jooq:jooq-codegen:${jooqVersion}"
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
+liquibase {
+  activities {
+    development {
+      changeLogFile "${rootDir}/model/migrations/migrations.xml"
+      url 'jdbc:postgresql://localhost:5432/cellarhq'
+      username 'cellarhq'
+      password 'cellarhq'
+    }
+
+    testing {
+      changeLogFile "${rootDir}/model/migrations/migrations.xml"
+      url 'jdbc:postgresql://localhost:5432/cellarhq_testing'
+      username 'cellarhq'
+      password 'cellarhq'
+    }
+
+    production {
+      if (System.getenv("DATABASE_URL")) {
+        URI dbUri = new URI(System.getenv("DATABASE_URL"));
+
+        String herokuUsername = dbUri.getUserInfo().split(":")[0];
+        String herokuPassword = dbUri.getUserInfo().split(":")[1];
+        String herokuJdbc = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
+
+        changeLogFile "${rootDir}/model/migrations/migrations.xml"
+        url herokuJdbc
+        username herokuUsername
+        password herokuPassword
+      }
+    }
+  }
+
+  if (project.hasProperty('runList')) {
+    runList = project.property('runList')
+  } else {
+    if (rootProject.gradle.startParameter.taskNames.contains('test')
+      || rootProject.gradle.startParameter.taskNames.contains('check')) {
+      runList = 'testing'
+    } else {
+      runList = 'development'
+    }
+  }
+}
+
+jooq {
+  version = '3.12.3'
+  edition = 'OSS'
+  generateSchemaSourceOnCompilation = false
+  cellarhq(sourceSets.main) {
+    jdbc {
+      driver = 'org.postgresql.Driver'
+      url = 'jdbc:postgresql://localhost:5432/cellarhq'
+      user = 'cellarhq'
+      password = 'cellarhq'
+      schema = 'public'
+    }
+    generator {
+      name = 'org.jooq.codegen.DefaultGenerator'
+      strategy {
+        name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+      }
+      database {
+        name = ' org.jooq.meta.postgres.PostgresDatabase'
+        inputSchema = 'public'
+      }
+      generate {
+        javaTimeTypes = true
+        pojos = true
+        jpaAnnotations = true
+        daos = true
+      }
+      target {
+        directory = "${this.project.projectDir}/src/main/generated"
+        packageName = 'com.cellarhq.generated'
+      }
+    }
+  }
+}
